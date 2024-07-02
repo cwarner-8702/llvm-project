@@ -2771,21 +2771,21 @@ static bool CheckedIntArithmetic(EvalInfo &Info, const Expr *E,
                                  const APSInt &LHS, const APSInt &RHS,
                                  unsigned BitWidth, Operation Op,
                                  APSInt &Result) {
-  if (LHS.isUnsigned()) {
-    Result = Op(LHS, RHS);
-    return true;
-  }
-
-  APSInt Value(Op(LHS.extend(BitWidth), RHS.extend(BitWidth)), false);
+  APSInt Value(Op(LHS.extend(BitWidth), RHS.extend(BitWidth)), LHS.isUnsigned());
   Result = Value.trunc(LHS.getBitWidth());
   if (Result.extend(BitWidth) != Value) {
-    if (Info.checkingForUndefinedBehavior())
-      Info.Ctx.getDiagnostics().Report(E->getExprLoc(),
-                                       diag::warn_integer_constant_overflow)
-          << toString(Result, 10, Result.isSigned(), /*formatAsCLiteral=*/false,
-                      /*UpperCase=*/true, /*InsertSeparators=*/true)
-          << E->getType() << E->getSourceRange();
-    return HandleOverflow(Info, E, Value, E->getType());
+    if (Result.isUnsigned())
+      Result.setDidWraparound(true);
+    else {
+      if (Info.checkingForUndefinedBehavior())
+        Info.Ctx.getDiagnostics().Report(E->getExprLoc(),
+                                         diag::warn_integer_constant_overflow)
+            << toString(Result, 10, Result.isSigned(),
+                        /*formatAsCLiteral=*/false,
+                        /*UpperCase=*/true, /*InsertSeparators=*/true)
+            << E->getType() << E->getSourceRange();
+      return HandleOverflow(Info, E, Value, E->getType());
+    }
   }
   return true;
 }

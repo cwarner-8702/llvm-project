@@ -22,6 +22,7 @@ namespace llvm {
 /// An arbitrary precision integer that knows its signedness.
 class [[nodiscard]] APSInt : public APInt {
   bool IsUnsigned = false;
+  bool DidWraparound = false;
 
 public:
   /// Default constructor that creates an uninitialized APInt.
@@ -78,6 +79,10 @@ public:
   bool isUnsigned() const { return IsUnsigned; }
   void setIsUnsigned(bool Val) { IsUnsigned = Val; }
   void setIsSigned(bool Val) { IsUnsigned = !Val; }
+
+  // Query wrap-around information
+  bool didWraparound() const { return DidWraparound; }
+  void setDidWraparound(bool Val) { DidWraparound = Val; }
 
   /// Append this APSInt to the specified SmallString.
   void toString(SmallVectorImpl<char> &Str, unsigned Radix = 10) const {
