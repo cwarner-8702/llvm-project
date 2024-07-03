@@ -65,6 +65,15 @@ long t5() {
   // CHECK-NOTES-NI: :[[@LINE-4]]:10: note: perform multiplication in a wider type
 }
 
+long t6() {
+  const unsigned int a = 4294967295u; // unsigned int max
+  return a * 1u;
+  // CHECK-NOTES-NI: :[[@LINE-1]]:10: warning: performing an implicit widening conversion to type 'long' of a multiplication performed in type 'unsigned int'
+  // CHECK-NOTES-NI: :[[@LINE-2]]:10: note: make conversion explicit to silence this warning
+  // CHECK-NOTES-NI:                  static_cast<long>( )
+  // CHECK-NOTES-NI: :[[@LINE-4]]:10: note: perform multiplication in a wider type
+}
+
 unsigned long n0() {
   const int a = 1073741824; // 1/2 of int32_t max
   const int b = 3;
@@ -75,7 +84,11 @@ unsigned long n0() {
   // CHECK-NOTES-ALL: :[[@LINE-4]]:10: note: perform multiplication in a wider type
 }
 
-double n1() {
-  const long a = 100000000;
-  return a * 400;
+long n1() {
+  const unsigned int a = 4294967295u; // unsigned int max
+  return a * 3u;
+  // CHECK-NOTES-ALL: :[[@LINE-1]]:10: warning: performing an implicit widening conversion to type 'long' of a multiplication performed in type 'unsigned int'
+  // CHECK-NOTES-ALL: :[[@LINE-2]]:10: note: make conversion explicit to silence this warning
+  // CHECK-NOTES-ALL:                  static_cast<long>( )
+  // CHECK-NOTES-ALL: :[[@LINE-4]]:10: note: perform multiplication in a wider type
 }
