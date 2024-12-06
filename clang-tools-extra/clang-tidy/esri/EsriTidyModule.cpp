@@ -9,6 +9,7 @@
 #include "../ClangTidy.h"
 #include "../ClangTidyModule.h"
 #include "../ClangTidyModuleRegistry.h"
+#include "ImplicitCastToSizetCheck.h"
 
 namespace clang::tidy {
 namespace esri {
@@ -16,6 +17,9 @@ namespace esri {
 class EsriTidyModule : public ClangTidyModule {
 public:
   void addCheckFactories(ClangTidyCheckFactories &CheckFactories) override {
+    CheckFactories.registerCheck<ImplicitCastToSizetCheck>(
+        "esri-implicit-cast-to-sizet");
+  }
 };
 
 // Register the EsriTidyModule using this statically initialized variable.
